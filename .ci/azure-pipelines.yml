@@ -24,20 +24,20 @@ jobs:
         BuildConfiguration: Debug
 
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: 'windows-latest'
 
   steps:
-  - task: UseDotNet@2
-    displayName: 'Update DotNet'
-    inputs:
-      packageType: sdk
-      version: '3.1.100'
+  - task: NuGetToolInstaller@0
+    displayName: 'Install Nuget'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Publish Server'
+  - task: NuGetCommand@2
+    displayName: 'Restore Packages'
     inputs:
-      command: publish
-      publishWebProjects: false
-      projects: 'Jellyfin/Jellyfin.csproj'
-      arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-      zipAfterPublish: false
+      restoreSolution: '$(Build.SourcesDirectory)/JellyfinUwp.sln'
+
+  - task: VSBuild@1
+    displayName: 'Build Client'
+    inputs:
+      platform: 'x64'
+      solution: '$(Build.SourcesDirectory)/JellyfinUwp.sln'
+      configuration: '$(BuildConfiguration)'
